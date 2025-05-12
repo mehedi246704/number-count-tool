@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Number Count Sheet</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 500px;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      margin: 15px 0;
+    }
+    button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border: none;
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2 style="text-align:center;">Number Count Sheet</h2>
+
+  <input type="file" id="csvFile" accept=".csv" />
+  <textarea id="searchNumbers" placeholder="Enter specific numbers (one per line) here..."></textarea>
+  
+  <button onclick="countNumbers()">Count Now</button>
+  <button onclick="copyToClipboard()">Copy Result</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+  let csvNumbers = [];
+
+  document.getElementById("csvFile").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const text = event.target.result;
+      const lines = text.split(/\r?\n/);
+      csvNumbers = lines.map(line => line.split(',')[0].trim()).filter(Boolean);
+      alert("CSV uploaded successfully!");
+    };
+    reader.readAsText(file);
+  });
+
+  function countNumbers() {
+    const inputText = document.getElementById("searchNumbers").value.trim();
+    if (!inputText || csvNumbers.length === 0) {
+      alert("Please upload a CSV file and enter search numbers.");
+      return;
+    }
+
+    const searchItems = inputText.split(/\r?\n/).map(item => item.trim()).filter(Boolean);
+
+    let table = "<table><tr><th>Serial</th><th>Number</th><th>Count</th></tr>";
+    searchItems.forEach((number, index) => {
+      const count = csvNumbers.filter(n => n === number).length;
+      table += `<tr><td>${index + 1}</td><td>${number}</td><td>${count}</td></tr>`;
+    });
+    table += "</table>";
+
+    document.getElementById("result").innerHTML = table;
+  }
+
+  function copyToClipboard() {
+    const table = document.querySelector("#result table");
+    if (!table) return alert("No result to copy!");
+
+    let text = "";
+    for (let row of table.rows) {
+      let rowText = Array.from(row.cells).map(cell => cell.innerText).join("\t");
+      text += rowText + "\n";
+    }
+
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Result copied to clipboard!");
+    });
+  }
+</script>
+
+</body>
+</html>

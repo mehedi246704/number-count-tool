@@ -22,5 +22,4 @@ A simple web app that allows users to upload a CSV or paste a list of numbers, t
 - HTML
 - CSS
 - JavaScript
-
-## 🙌 Author
+- 
